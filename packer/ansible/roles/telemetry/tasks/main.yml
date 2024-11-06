@@ -1,0 +1,19 @@
+- name: Purge apt packages and mark hold to prevent updates/installs
+  ansible.builtin.include_tasks: purge.yml
+  loop:
+    - name: apport-symptoms
+    - name: apport
+    - name: whoopsie
+    - name: ubuntu-report
+    - name: unattended-upgrades
+    - name: snapd
+
+- name: Stop and disable auto upgrade services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  ignore_errors: true
+  with_items:
+    - apt-daily-upgrade
+    - apt-daily

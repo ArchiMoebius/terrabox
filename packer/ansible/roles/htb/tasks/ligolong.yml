@@ -1,0 +1,43 @@
+- name: Clone ligolo-ng repo
+  ansible.builtin.git:
+    repo: https://github.com/nicocha30/ligolo-ng.git
+    dest: "{{ vm_tool_base }}/ligolo-ng"
+    depth: 1
+  register: ligolo
+
+- name: Build ligolo-ng server
+  ansible.builtin.command:
+    cmd: go build -ldflags="-s -w" -trimpath -o proxy cmd/proxy/main.go
+    chdir: "{{ vm_tool_base }}/ligolo-ng"
+  environment:
+    - PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
+  when: ligolo.before != ligolo.after
+
+# Note: Not using -literals due to size bloat
+- name: Build garbled ligolo-ng agent for linux
+  ansible.builtin.command:
+    cmd: /usr/local/go/bin/garble -tiny -seed=random build -ldflags="-s -w" -trimpath -o agent cmd/agent/main.go
+    chdir: "{{ vm_tool_base }}/ligolo-ng"
+  environment:
+    - CGO_ENABLED: 1
+    - GOARCH: amd64
+    - PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
+
+- name: Build garbled ligolo-ng agent for windows
+  ansible.builtin.command:
+    cmd: /usr/local/go/bin/garble -tiny -seed=random build -ldflags="-s -w -H windowsgui" -trimpath -o agent.exe cmd/agent/main.go
+    chdir: "{{ vm_tool_base }}/ligolo-ng"
+  environment:
+    - CGO_ENABLED: 1
+    - GOARCH: amd64
+    - GOOS: windows
+    - PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
+
+- name: Symlink ligolo-ng server
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/ligolo-ng/proxy"
+    dest: /usr/local/bin/ligolo-ng-proxy
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    force: true

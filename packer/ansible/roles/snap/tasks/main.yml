@@ -1,0 +1,40 @@
+- name: Get the list of snaps to remove
+  ansible.builtin.shell: snap list | cut -f 1 -d' '
+  register: snaps
+
+- name: Remove snaps
+  community.general.snap:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ snaps.stdout_lines }}"
+  ignore_errors: true
+
+# twice, because some deps. on core => so just do it twice vs. looping killing/checking/removing
+- name: Get the next list of snaps to remove
+  ansible.builtin.shell: snap list | cut -f 1 -d' '
+  register: snaps
+
+- name: Remove snaps
+  community.general.snap:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ snaps.stdout_lines }}"
+  ignore_errors: true
+
+- name: Clean-up snap directories
+  ansible.builtin.shell: rm -rf /home/{{ ansible_user }}/snap /snap /var/snap /var/lib/snapd /var/cache/snapd /usr/lib/snapd || echo ''
+
+# thrice, because some deps. on core => so just do it thrise vs. looping killing/checking/removing
+- name: Get the next list of snaps to remove
+  ansible.builtin.shell: snap list | cut -f 1 -d' '
+  register: snaps
+
+- name: Remove snaps
+  community.general.snap:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ snaps.stdout_lines }}"
+  ignore_errors: true
+
+- name: Clean-up snap directories
+  ansible.builtin.shell: rm -rf /home/{{ ansible_user }}/snap /snap /var/snap /var/lib/snapd /var/cache/snapd /usr/lib/snapd || echo ''

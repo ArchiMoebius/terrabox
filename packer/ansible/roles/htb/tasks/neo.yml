@@ -1,0 +1,9 @@
+- name: Install neoregeorg
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: neoregeorg
+      repo: https://github.com/L-codes/Neo-reGeorg.git
+      scripts:
+        - neoreg.py
+      packages:
+        - requests

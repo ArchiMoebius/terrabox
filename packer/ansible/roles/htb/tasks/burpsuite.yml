@@ -1,0 +1,37 @@
+- name: Check if BurpSuite is already installed
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/burpsuite/BurpSuiteCommunity"
+  register: burpsuite
+
+- name: "Make {{ vm_tool_base }}/burpsuite"
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/burpsuite"
+    state: directory
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    mode: "0750"
+  when: not burpsuite.stat.exists
+
+- name: Download BurpSuite install script
+  ansible.builtin.get_url:
+    url: https://portswigger-cdn.net/burp/releases/download?product=community&version=2024.6.6&type=Linux
+    dest: "{{ vm_tool_base }}/burpsuite/install.sh"
+    checksum: sha256:e38efb0e28fa6d67cddcecb80d5c2db9fe94f38441354a9b000da2a144948e26
+    mode: "0755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  when: not burpsuite.stat.exists
+
+- name: Run BurpSuite install script # noqa no-changed-when
+  ansible.builtin.command:
+    cmd: "{{ vm_tool_base }}/burpsuite/install.sh -q -dir {{ vm_tool_base }}/burpsuite"
+    chdir: "{{ vm_tool_base }}/burpsuite"
+  when: not burpsuite.stat.exists
+
+- name: Symlink burpsuite
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/burpsuite/BurpSuiteCommunity"
+    dest: /usr/local/bin/burpsuite
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"

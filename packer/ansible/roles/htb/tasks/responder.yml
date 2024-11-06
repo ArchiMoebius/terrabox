@@ -1,0 +1,7 @@
+- name: Install Responder
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: responder
+      repo: https://github.com/lgandx/Responder.git
+      scripts:
+        - Responder.py

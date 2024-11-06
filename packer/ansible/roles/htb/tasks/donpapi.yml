@@ -1,0 +1,6 @@
+- name: Install DonPAPI
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: donpapi
+      repo: https://github.com/login-securite/DonPAPI.git
+      pipx: true

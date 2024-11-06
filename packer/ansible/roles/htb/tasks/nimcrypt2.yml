@@ -1,0 +1,18 @@
+- name: Clone Nimcrypt2 repo
+  ansible.builtin.git:
+    repo: https://github.com/ArchiMoebius/Nimcrypt2.git
+    dest: "{{ vm_tool_base }}/nimcrypt2"
+    depth: 1
+    force: true
+
+- name: Build Nimcrypt2 docker image
+  community.docker.docker_image:
+    build:
+      path: "{{ vm_tool_base }}/nimcrypt2"
+    name: nimcrypt2
+    source: build
+
+- name: Add nimcrypt2.rc to bashrc
+  ansible.builtin.lineinfile:
+    path: /home/{{ vm_user }}/.dotrc
+    line: source {{ vm_tool_base }}/nimcrypt2/nimcrypt2.rc

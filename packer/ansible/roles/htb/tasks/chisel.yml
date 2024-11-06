@@ -1,0 +1,34 @@
+- name: Clone chisel repo
+  ansible.builtin.git:
+    repo: https://github.com/jpillora/chisel.git
+    dest: "{{ vm_tool_base }}/chisel"
+    depth: 1
+  register: chisel
+
+# Note: Not using -literals due to size bloat
+- name: Build garbled chisel for linux
+  ansible.builtin.shell:
+    cmd: garble -tiny -seed=random build -ldflags="-s -w" -trimpath -o chisel
+    chdir: "{{ vm_tool_base }}/chisel"
+  environment:
+    - CGO_ENABLED: 1
+    - GOARCH: amd64
+    - PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
+
+- name: Build garbled chisel for windows
+  ansible.builtin.shell:
+    cmd: garble -tiny -seed=random build -ldflags="-s -w -H windowsgui" -trimpath -o chisel.exe
+    chdir: "{{ vm_tool_base }}/chisel"
+  environment:
+    - CGO_ENABLED: 1
+    - GOARCH: amd64
+    - GOOS: windows
+    - PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
+
+- name: Symlink chisel
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/chisel/chisel"
+    dest: /usr/local/bin/chisel
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"

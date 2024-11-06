@@ -1,0 +1,18 @@
+- name: Copy .dotrc
+  ansible.builtin.copy:
+    src: files/.dotrc
+    dest: "/home/{{ vm_user }}/.dotrc"
+    mode: "0775"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    force: true
+
+- name: "Update PATH for {{ vm_user }}"
+  ansible.builtin.lineinfile:
+    path: "/home/{{ vm_user }}/.dotrc"
+    line: export PATH=$PATH:/usr/local/go/bin:/home/{{ vm_user }}/.local/bin:/
+
+- name: "Update PATH for root"
+  ansible.builtin.lineinfile:
+    path: "/root/.bashrc"
+    line: export PATH=$PATH:/usr/local/go/bin:/home/{{ vm_user }}/.local/bin:/

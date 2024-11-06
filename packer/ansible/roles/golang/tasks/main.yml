@@ -1,0 +1,18 @@
+- name: Check if golang exists
+  ansible.builtin.stat:
+    path: /usr/local/go/bin/go
+  register: go_bin
+
+- name: Download golang
+  ansible.builtin.get_url:
+    url: "https://go.dev/dl/go1.23.2.linux-amd64.tar.gz"
+    dest: /tmp/golang.tgz
+    mode: "600"
+  when: not go_bin.stat.exists
+
+- name: Extract golang
+  ansible.builtin.unarchive:
+    src: /tmp/golang.tgz
+    dest: /usr/local
+    remote_src: true
+  when: not go_bin.stat.exists

@@ -1,0 +1,47 @@
+- name: Check if zig exists
+  ansible.builtin.stat:
+    path: /usr/local/zig-linux-x86_64-0.13.0/zig
+  register: zig_bin
+
+- name: Download zig
+  ansible.builtin.get_url:
+    url: "https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz"
+    dest: /tmp/zig.tgz
+    mode: "0600"
+  when: not zig_bin.stat.exists
+
+- name: Extract zig
+  ansible.builtin.unarchive:
+    src: /tmp/zig.tgz
+    dest: /usr/local
+    remote_src: true
+  when: not zig_bin.stat.exists
+
+- name: Add zig to bashrc
+  ansible.builtin.lineinfile:
+    path: /home/{{ vm_user }}/.dotrc
+    line: "export PATH=$PATH:/usr/local/zig-linux-x86_64-0.13.0/"
+
+- name: Add zig to bashrc
+  ansible.builtin.lineinfile:
+    path: /root/.bashrc
+    line: "export PATH=$PATH:/usr/local/zig-linux-x86_64-0.13.0/"
+
+- name: Check if zls exists
+  ansible.builtin.stat:
+    path: /usr/local/zig-linux-x86_64-0.13.0/zls
+  register: zls_bin
+
+- name: Download zig
+  ansible.builtin.get_url:
+    url: "https://github.com/zigtools/zls/releases/download/0.13.0/zls-x86_64-linux.tar.xz"
+    dest: /tmp/zls.tgz
+    mode: "0600"
+  when: not zls_bin.stat.exists
+
+- name: Extract zig
+  ansible.builtin.unarchive:
+    src: /tmp/zls.tgz
+    dest: /usr/local/zig-linux-x86_64-0.13.0
+    remote_src: true
+  when: not zls_bin.stat.exists

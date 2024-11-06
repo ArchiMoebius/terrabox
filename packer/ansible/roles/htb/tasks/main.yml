@@ -1,0 +1,85 @@
+- name: Setup garble
+  ansible.builtin.include_tasks: garble.yml
+
+- name: Setup adidnsdump
+  ansible.builtin.include_tasks: adidnsdump.yml
+- name: Setup bloodhound-python
+  ansible.builtin.include_tasks: bloodhound-python.yml
+- name: Setup bloodhound
+  ansible.builtin.include_tasks: bloodhound.yml
+- name: Setup burpsuite
+  ansible.builtin.include_tasks: burpsuite.yml
+- name: Setup certipy
+  ansible.builtin.include_tasks: certipy.yml
+- name: Setup chisel
+  ansible.builtin.include_tasks: chisel.yml
+- name: Setup clrvoyance
+  ansible.builtin.include_tasks: clrvoyance.yml
+- name: Setup coercer
+  ansible.builtin.include_tasks: coercer.yml
+- name: Setup defendercheck
+  ansible.builtin.include_tasks: defendercheck.yml
+- name: Setup donpapi
+  ansible.builtin.include_tasks: donpapi.yml
+- name: Setup dploot
+  ansible.builtin.include_tasks: dploot.yml
+- name: Setup godpotato
+  ansible.builtin.include_tasks: godpotato.yml
+- name: Setup impacket
+  ansible.builtin.include_tasks: impacket.yml
+- name: Setup johntheripper
+  ansible.builtin.include_tasks: johntheripper.yml
+- name: Setup kerbrute
+  ansible.builtin.include_tasks: kerbrute.yml
+- name: Setup lazagne
+  ansible.builtin.include_tasks: lazagne.yml
+- name: Setup ldapdomaindump
+  ansible.builtin.include_tasks: ldapdomaindump.yml
+- name: Setup ligolong
+  ansible.builtin.include_tasks: ligolong.yml
+- name: Setup neo
+  ansible.builtin.include_tasks: neo.yml
+- name: Setup netexec
+  ansible.builtin.include_tasks: netexec.yml
+- name: Setup nimcrypt2
+  ansible.builtin.include_tasks: nimcrypt2.yml
+- name: Setup pcredz
+  ansible.builtin.include_tasks: pcredz.yml
+- name: Setup pkinittools
+  ansible.builtin.include_tasks: pkinittools.yml
+- name: Setup pylaps
+  ansible.builtin.include_tasks: pylaps.yml
+- name: Setup pypykatz
+  ansible.builtin.include_tasks: pypykatz.yml
+- name: Setup pywhisker
+  ansible.builtin.include_tasks: pywhisker.yml
+- name: Setup responder
+  ansible.builtin.include_tasks: responder.yml
+- name: Setup rmg
+  ansible.builtin.include_tasks: rmg.yml
+- name: Setup rssh
+  ansible.builtin.include_tasks: rssh.yml
+- name: Setup seclist
+  ansible.builtin.include_tasks: seclist.yml
+- name: Setup sharpcollection
+  ansible.builtin.include_tasks: sharpcollection.yml
+- name: Setup sharpcradle
+  ansible.builtin.include_tasks: sharpcradle.yml
+- name: Setup sharpyshell
+  ansible.builtin.include_tasks: sharpyshell.yml
+- name: Setup sigmapotato
+  ansible.builtin.include_tasks: sigmapotato.yml
+- name: Setup sliver
+  ansible.builtin.include_tasks: sliver.yml
+- name: Setup sqlmap
+  ansible.builtin.include_tasks: sqlmap.yml
+- name: Setup weevely
+  ansible.builtin.include_tasks: weevely.yml
+- name: Setup wesng
+  ansible.builtin.include_tasks: wesng.yml
+- name: Setup wmiprocesswatcher
+  ansible.builtin.include_tasks: wmiprocesswatcher.yml
+- name: Setup ysoserial
+  ansible.builtin.include_tasks: ysoserial.yml
+- name: Setup zig-win32-utilities
+  ansible.builtin.include_tasks: zig-win32-utilities.yml

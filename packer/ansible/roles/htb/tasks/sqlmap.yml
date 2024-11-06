@@ -1,0 +1,7 @@
+- name: Install sqlmap
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: sqlmap
+      repo: https://github.com/sqlmapproject/sqlmap
+      scripts:
+        - sqlmap.py

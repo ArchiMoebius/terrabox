@@ -1,0 +1,6 @@
+- name: Install NetExec
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: netexec
+      repo: https://github.com/Pennyw0rth/NetExec.git
+      pipx: true

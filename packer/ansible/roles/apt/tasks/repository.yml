@@ -1,0 +1,30 @@
+- name: "Add APT key {{ item.name }}"
+  ansible.builtin.apt_key:
+    url: "{{ item.key_url }}"
+    keyring: "/usr/share/keyrings/{{ item.name }}.gpg"
+
+- name: "Add APT repository {{ item.name }}"
+  ansible.builtin.apt_repository:
+    filename: "{{ item.name }}"
+    repo: "deb [{{ item.repo_extra }} signed-by=/usr/share/keyrings/{{ item.name }}.gpg] {{ item.repo_url }} {{ item.repo_pool }}"
+    state: present
+    update_cache: false
+
+- name: "Set pref file for inclusion of {{ item.name }}"
+  ansible.builtin.template:
+    src: templates/apt.pref
+    dest: "/etc/apt/preferences.d/prefer-{{ item.name }}.pref"
+    mode: "644"
+  when: item.pref_url is defined
+
+- name: "Remove any packages for repo setup {{ item.name }}"
+  ansible.builtin.apt:
+    name: "{{ package }}"
+    force: true
+    install_recommends: false
+    purge: true
+    state: absent
+  with_items: "{{ item.repo_remove | split(',') }}"
+  loop_control:
+    loop_var: package
+  when: item.repo_remove is defined

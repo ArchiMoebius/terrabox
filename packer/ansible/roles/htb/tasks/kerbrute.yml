@@ -1,0 +1,38 @@
+- name: Check if kerbrute is already installed
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/kerbrute/kerbrute"
+  register: kerbrute_bin
+
+- name: "Make {{ vm_tool_base }}/kerbrute"
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/kerbrute"
+    state: directory
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    mode: "0750"
+  when: not kerbrute_bin.stat.exists
+
+- name: Get latest kerbrute release
+  community.general.github_release:
+    user: ropnop
+    repo: kerbrute
+    action: latest_release
+  register: kerbrute
+  when: not kerbrute_bin.stat.exists
+
+- name: Download latest kerbrute release
+  ansible.builtin.get_url:
+    url: https://github.com/ropnop/kerbrute/releases/download/{{ kerbrute.tag }}/kerbrute_linux_amd64
+    dest: "{{ vm_tool_base }}/kerbrute/kerbrute"
+    mode: "755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  when: not kerbrute_bin.stat.exists
+
+- name: Symlink kerbrute
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/kerbrute/kerbrute"
+    dest: /usr/local/bin/kerbrute
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"

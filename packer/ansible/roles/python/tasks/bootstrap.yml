@@ -1,0 +1,75 @@
+- name: Clone {{ item.name }}
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ vm_tool_base }}/{{ item.name }}"
+    depth: 1
+    version: "{{ item.repo_branch }}"
+    force: true
+  when: item.repo_branch is defined
+
+- name: Clone {{ item.name }}
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ vm_tool_base }}/{{ item.name }}"
+    depth: 1
+    force: true
+  when: item.repo_branch is not defined
+
+- name: Use pipx to install python package {{ item.name }}
+  community.general.pipx:
+    name: "{{ item.name }}"
+    source: "{{ vm_tool_base }}/{{ item.name }}"
+    editable: "{{ item.pipx_editable | default('true') }}"
+    global: "{{ item.pipx_global | default('true') }}"
+  when: item.pipx is defined and item.pipx
+
+- name: Check if requirements.txt exists for {{ item.name }}
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/{{ item.name }}/requirements.txt"
+  register: requirements
+  when: item.pipx is not defined or not item.pipx
+
+- name: Install pip requirements.txt in {{ item.name }}
+  ansible.builtin.pip:
+    requirements: "{{ vm_tool_base }}/{{ item.name }}/requirements.txt"
+    virtualenv: "{{ vm_tool_base }}/{{ item.name }}/env"
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  when: (item.pipx is not defined or not item.pipx) and requirements.stat.exists
+
+- name: Install pip extra packages in {{ item.name }}
+  ansible.builtin.pip:
+    name: "{{ item.packages }}"
+    virtualenv: "{{ vm_tool_base }}/{{ item.name }}/env"
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  when: (item.pipx is not defined or not item.pipx) and item.packages is defined
+
+- name: Replace shebang line in scripts for {{ item.name }}
+  ansible.builtin.replace:
+    path: "{{ vm_tool_base }}/{{ item.name }}/{{ script }}"
+    regexp: "^#!/usr/bin/env python"
+    replace: "#!{{ vm_tool_base }}/{{ item.name }}/env/bin/python"
+  loop: "{{ item.scripts }}"
+  loop_control:
+    loop_var: script
+  when: (item.pipx is not defined or not item.pipx) and item.scripts is defined and (requirements.stat.exists)
+
+- name: Make scripts executable for {{ item.name }}
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/{{ item.name }}/{{ script }}"
+    mode: "775"
+  loop: "{{ item.scripts }}"
+  loop_control:
+    loop_var: script
+  when: (item.pipx is not defined or not item.pipx) and item.scripts is defined
+
+- name: Symlink scripts in {{ item.name }}
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/{{ item.name }}/{{ script }}"
+    dest: /usr/local/bin/{{ script | basename }}
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  loop: "{{ item.scripts }}"
+  loop_control:
+    loop_var: script
+  when: (item.pipx is not defined or not item.pipx) and item.scripts is defined

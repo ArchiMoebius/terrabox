@@ -1,0 +1,7 @@
+- name: Install SharPyShell
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: sharpyshell
+      repo: https://github.com/antonioCoco/SharPyShell.git
+      scripts:
+        - SharPyShell.py

@@ -1,0 +1,13 @@
+- name: Install CLRvoyance
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: clrvoyance
+      repo: https://github.com/Accenture/CLRvoyance.git
+      scripts:
+        - CLRvoyance/clrvoyance.py
+
+- name: Add shebang line to clrvoyance.py as it's lacking one...
+  ansible.builtin.lineinfile:
+    path: "{{ vm_tool_base }}/clrvoyance/CLRvoyance/clrvoyance.py"
+    line: "#!/usr/bin/python3"
+    insertbefore: "^from argparse import ArgumentParser"

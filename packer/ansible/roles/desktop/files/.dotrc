@@ -1,0 +1,39 @@
+function fwl() {
+  sudo iptables -L INPUT -nv --line-numbers
+}
+
+function fwd() {
+  sudo iptables -D INPUT $1
+  fwl
+}
+
+function fwb() {
+  sudo iptables -I INPUT -s $1 -j DROP
+}
+
+function fwa() {
+  sudo iptables -I INPUT -p tcp -s $1 --dport $2 -j ACCEPT
+}
+
+function fwp() {
+  sudo awk -F' ' {'print $9 " " $10 " " $11 " " $12 " " $19 " " $20 " " $21'} /var/log/iptables.log
+}
+
+function bloodhound() {
+  docker compose -f /usr/local/src/bloodhound/examples/docker-compose/docker-compose.yml up -d
+}
+
+function bloodhound_logs() {
+  docker compose -f /usr/local/src/bloodhound/examples/docker-compose/docker-compose.yml logs
+}
+
+function nimcrypt2() {
+  NF=$1
+  DIR=`dirname $NF`
+  FN=`basename $NF | cut -f1 -d'.'`
+
+  docker run --rm -it -v $DIR:/pack nimcrypt2 -f /pack/$NF -o /pack/${FN}_packed.exe ${@:2}
+}
+
+alias msfconsole='docker run --network host --volume /tmp/:/tmp/ --rm -it metasploit'
+alias msfvenom='docker run --rm -it --volume /tmp/:/tmp/ --entrypoint /bin/bash metasploit'

@@ -1,0 +1,13 @@
+- name: Clone zig-win32-utilities
+  ansible.builtin.git:
+    repo: https://github.com/ArchiMoebius/zig-win32-utilities.git
+    dest: "{{ vm_tool_base }}/zig-win32-utilities"
+    depth: 1
+  register: zigwin32utilities
+
+- name: Build zig-win32-utilities
+  ansible.builtin.command:
+    cmd: make
+    chdir: "{{ vm_tool_base }}/zig-win32-utilities"
+  environment:
+    - PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin:/usr/local/zig-linux-x86_64-0.13.0

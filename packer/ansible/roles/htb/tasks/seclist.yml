@@ -1,0 +1,5 @@
+- name: Install SecLists
+  ansible.builtin.git:
+    repo: https://github.com/danielmiessler/SecLists.git
+    dest: "{{ vm_tool_base }}/seclists"
+    depth: 1

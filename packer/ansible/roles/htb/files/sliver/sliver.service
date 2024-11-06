@@ -1,0 +1,15 @@
+[Unit]
+Description=Sliver
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=3
+User=root
+ExecStart=/usr/local/src/sliver/sliver-server daemon --lhost 127.0.0.1
+# TODO: use a template for the vm_tool_base path...
+
+[Install]
+WantedBy=multi-user.target

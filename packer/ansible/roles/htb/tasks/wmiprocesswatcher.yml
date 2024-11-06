@@ -1,0 +1,5 @@
+- name: Clone WMIProcessWatcher repo
+  ansible.builtin.git:
+    repo: https://github.com/hackerhouse-opensource/WMIProcessWatcher.git
+    dest: "{{ vm_tool_base }}/wmiprocesswatcher"
+    depth: 1

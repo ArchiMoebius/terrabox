@@ -1,0 +1,9 @@
+- name: Install PKINITtools
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: pkinittools
+      repo: https://github.com/dirkjanm/PKINITtools.git
+      scripts:
+        - gettgtpkinit.py
+        - getnthash.py
+        - gets4uticket.py

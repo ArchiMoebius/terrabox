@@ -1,0 +1,9 @@
+- name: Install Lazagne
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: lazagne
+      repo: https://github.com/AlessandroZ/LaZagne.git
+      scripts:
+        - Linux/laZagne.py
+      packages:
+        - git+https://github.com/fortra/impacket.git

@@ -1,0 +1,6 @@
+- name: Install impacket
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: impacket
+      repo: https://github.com/fortra/impacket.git
+      pipx: true

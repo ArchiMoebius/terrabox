@@ -1,0 +1,57 @@
+*filter
+# Allow all outgoing, but drop incoming and forwarding packets by default
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# Custom per-protocol chains
+:UDP - [0:0]
+:TCP - [0:0]
+:ICMP - [0:0]
+
+# Logs
+-N LOG_DROP
+-A LOG_DROP -j LOG --log-level 6 --log-prefix "IPTABLES:DROP: "
+-A LOG_DROP -j DROP
+
+-A INPUT -i lo -j ACCEPT
+-A OUTPUT -o lo -j ACCEPT
+-A INPUT -s fe80::0000:0000:0000:0000/16 -j ACCEPT
+-A INPUT -d fe80::0000:0000:0000:0000/16 -j ACCEPT
+
+-A INPUT -j LOG_DROP
+-A FORWARD -j LOG_DROP
+# Meh...
+-A OUTPUT -j ACCEPT
+-A UDP -j LOG_DROP
+-A TCP -j LOG_DROP
+-A ICMP -j LOG_DROP
+
+# Commit the changes
+COMMIT
+
+*raw
+:PREROUTING ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT
+
+*security
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+COMMIT

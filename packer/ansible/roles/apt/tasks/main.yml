@@ -1,0 +1,134 @@
+- name: Setup custom repositories
+  ansible.builtin.include_tasks: repository.yml
+  loop:
+    - name: regolith
+      key_url: https://regolith-desktop.org/regolith.key
+      repo_url: "https://regolith-desktop.org/release-current-{{ ansible_distribution | lower }}-{{ ansible_distribution_release | lower }}-amd64"
+      repo_extra: "arch=amd64"
+      repo_pool: "{{ ansible_distribution_release | lower }} main"
+    - name: firefox
+      key_url: https://packages.mozilla.org/apt/repo-signing-key.gpg
+      repo_url: "https://packages.mozilla.org/apt"
+      repo_extra: "arch=amd64"
+      repo_pool: "mozilla main"
+      pref_url: packages.mozilla.org
+    - name: docker
+      key_url: https://download.docker.com/linux/ubuntu/gpg
+      repo_url: "https://download.docker.com/linux/ubuntu"
+      repo_extra: "arch=amd64"
+      repo_pool: "{{ ansible_distribution_release | lower }} stable"
+      repo_remove: "docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc"
+    - name: vscodium
+      key_url: https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+      repo_url: "https://download.vscodium.com/debs"
+      repo_extra: "arch=amd64"
+      repo_pool: "vscodium main"
+    - name: mono
+      key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3fa7e0328081bff6a14da29aa6a19b38d3d831ef
+      repo_url: "https://download.mono-project.com/repo/ubuntu"
+      repo_pool: "stable-focal main"
+      repo_extra: ""
+
+- name: Update cache
+  ansible.builtin.command:
+    cmd: apt-get update
+
+- name: Upgrade packages to latest
+  ansible.builtin.command:
+    cmd: apt-get upgrade -y 
+
+- name: Upgrade packages to latest
+  ansible.builtin.command:
+    cmd: apt dist-upgrade 
+
+- name: Configure wireshark for users
+  ansible.builtin.debconf:
+    name: 'wireshark-common'
+    question: 'wireshark-common/install-setuid'
+    vtype: 'boolean'
+    value: 'true'
+
+- name: Install desired packages
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 86400 # One day
+    name:
+      - firefox
+      - regolith-desktop
+      - regolith-session-flashback
+      - regolith-look-solarized-dark
+      - i3xrocks-app-launcher
+      - i3xrocks-cpu-usage
+      - i3xrocks-disk-capacity
+      - i3xrocks-focused-window-name
+      - i3xrocks-info
+      - i3xrocks-memory
+      - i3xrocks-net-traffic
+      - i3xrocks-next-workspace
+      - i3xrocks-rofication
+      - i3xrocks-time
+      - i3xrocks-temp
+      - build-essential
+      - bzip2
+      - wireshark
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+      - iptables
+      - iptables-persistent
+      - openvpn
+      - zsh
+      - git
+      - neovim
+      - libreoffice
+      - python3-venv
+      - python3-pip
+      - krb5-user
+      - proxychains4
+      - sqlite3
+      - codium
+      - smbclient
+      - nmap
+      - p7zip-full
+      - jq
+      - openjdk-21-jdk
+      - openjdk-21-jdk-headless
+      - openjdk-21-jre
+      - tmux
+      - fonts-powerline
+      - curl
+      - ca-certificates
+      - net-tools
+      - whois
+      - tree
+      - ruby-dev
+      - mingw-w64
+      - libkrb5-dev
+      - rlwrap
+      - htop
+      - mono-devel
+      - dbus-x11
+      - ffuf
+      - gobuster
+      - hydra
+      - libssl-dev # for JTR
+      - libpcap-dev # for PCredz
+
+- name: "Adding groups for {{ vm_user }}"
+  ansible.builtin.user:
+    name: "{{ vm_user }}"
+    groups: docker,vboxsf,wireshark
+    append: true
+
+- name: Purge undesirables
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    purge: true
+  with_items:
+    - ufw
+    # - ubuntu-session # Work-around until this is fixed: https://github.com/regolith-linux/regolith-desktop/issues/504
+    - gnome-initial-setup
+    # - regolith-wm-workspace-config # Work-around until this is fixed: https://github.com/regolith-linux/regolith-desktop/issues/504

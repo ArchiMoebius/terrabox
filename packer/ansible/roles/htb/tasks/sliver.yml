@@ -1,0 +1,83 @@
+- name: Check if sliver is already installed
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/sliver/sliver-server"
+  register: sliver_bin
+
+- name: Get latest sliver release
+  community.general.github_release:
+    user: BishopFox
+    repo: sliver
+    action: latest_release
+  register: sliver
+
+- name: Make sliver directory
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/sliver"
+    state: directory
+    mode: "0755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Download latest sliver ({{ sliver.tag }})
+  ansible.builtin.get_url:
+    url: https://github.com/BishopFox/sliver/releases/download/{{ sliver.tag }}/{{ item.remote }}
+    dest: "{{ vm_tool_base }}/sliver/{{ item.local }}"
+    mode: "0755"
+  loop:
+    - remote: sliver-client_linux
+      local: sliver-client
+    - remote: sliver-server_linux
+      local: sliver-server
+  when: not sliver_bin.stat.exists
+
+- name: Create sliver service file
+  ansible.builtin.copy:
+    src: files/sliver/sliver.service
+    dest: /etc/systemd/system/sliver.service
+    mode: "0600"
+
+- name: Start sliver service
+  ansible.builtin.systemd_service:
+    name: sliver
+    state: started
+    enabled: true
+
+- name: Make client directory for user
+  ansible.builtin.file:
+    path: /home/{{ vm_user }}/.sliver-client/configs
+    state: directory
+    mode: "0750"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Check if config for user exists
+  ansible.builtin.stat:
+    path: /home/{{ vm_user }}/.sliver-client/configs/{{ vm_user }}_127.0.0.1.cfg
+  register: sliver_config
+
+- name: Generate config for user
+  ansible.builtin.command:
+    cmd: "{{ vm_tool_base }}/sliver/sliver-server operator --name {{ vm_user }} --lhost 127.0.0.1 --save /home/{{ vm_user }}/.sliver-client/configs"
+  when: not sliver_config.stat.exists
+
+- name: Change ownership on config
+  ansible.builtin.file:
+    path: "/home/{{ vm_user }}/.sliver-client/configs/{{ vm_user }}_127.0.0.1.cfg"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Symlink sliver_client
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/sliver/sliver-client"
+    dest: "/usr/local/bin/sliver_client"
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Symlink sliver_server
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/sliver/sliver-server"
+    dest: "/usr/local/bin/sliver_server"
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"

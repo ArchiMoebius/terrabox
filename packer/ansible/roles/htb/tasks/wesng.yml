@@ -1,0 +1,6 @@
+- name: Install wesng
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: wesng
+      repo: https://github.com/bitsadmin/wesng.git
+      pipx: true

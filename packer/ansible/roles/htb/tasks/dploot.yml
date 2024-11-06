@@ -1,0 +1,6 @@
+- name: Install dploot
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: dploot
+      repo: https://github.com/zblurx/dploot.git
+      pipx: true

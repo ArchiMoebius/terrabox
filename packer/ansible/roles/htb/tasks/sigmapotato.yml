@@ -1,0 +1,32 @@
+- name: Make sigmapotato directory
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/sigmapotato"
+    state: directory
+    mode: "755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Check if SigmaPotato is already installed
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/sigmapotato/SigmaPotato.exe"
+  register: sigmapotato_bin
+
+- name: Get latest SigmaPotato release
+  community.general.github_release:
+    user: tylerdotrar
+    repo: SigmaPotato
+    action: latest_release
+  register: sigmapotato
+  when: not sigmapotato_bin.stat.exists
+
+- name: Download latest SigmaPotato release
+  ansible.builtin.get_url:
+    url: https://github.com/tylerdotrar/SigmaPotato/releases/download/{{ sigmapotato.tag }}/{{ item }}.exe
+    dest: "{{ vm_tool_base }}/sigmapotato/{{ item }}.exe"
+    mode: "664"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  loop:
+    - SigmaPotato
+    - SigmaPotatoCore
+  when: not sigmapotato_bin.stat.exists

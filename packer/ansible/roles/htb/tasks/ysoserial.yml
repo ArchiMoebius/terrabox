@@ -1,0 +1,55 @@
+- name: Check if ysoserial is already installed
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/ysoserial/ysoserial.jar"
+  register: ysoserial_bin
+
+- name: Make {{ vm_tool_base }}/ysoserial
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/ysoserial"
+    state: directory
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    mode: "0750"
+  when: not ysoserial_bin.stat.exists
+
+- name: Get latest ysoserial release
+  community.general.github_release:
+    user: frohoff
+    repo: ysoserial
+    action: latest_release
+  register: ysoserial
+
+- name: Download latest ysoserial release
+  ansible.builtin.get_url:
+    url: https://github.com/frohoff/ysoserial/releases/download/{{ ysoserial.tag }}/ysoserial-all.jar
+    dest: "{{ vm_tool_base }}/ysoserial/ysoserial.jar"
+    mode: "0755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  when: not ysoserial_bin.stat.exists
+
+- name: Copy entrypoint script for ysoserial
+  ansible.builtin.copy:
+    src: files/ysoserial/ysoserial.sh
+    dest: "{{ vm_tool_base }}/ysoserial/ysoserial.sh"
+    mode: "0755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    force: true
+
+- name: Symlink ysoserial entrypoint
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/ysoserial/ysoserial.sh"
+    dest: /usr/local/bin/ysoserial
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+# Note: This is too much of a hassle to get built (need to install wine and dotnet48)
+# Can potentially use https://github.com/ar0x4/ysoserial.net-docker/blob/master/ysoserial_runner.sh, but it takes a while
+# to build this image
+- name: Clone ysoserial.net repo # noqa latest[git]
+  ansible.builtin.git:
+    repo: https://github.com/pwntester/ysoserial.net.git
+    dest: "{{ vm_tool_base }}/ysoerial.net"
+    depth: 1

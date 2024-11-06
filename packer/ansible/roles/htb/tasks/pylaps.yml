@@ -1,0 +1,9 @@
+- name: Install PyLaps
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: pylaps
+      repo: https://github.com/p0dalirius/pyLAPS.git
+      scripts:
+        - pyLAPS.py
+      packages:
+        - impacket

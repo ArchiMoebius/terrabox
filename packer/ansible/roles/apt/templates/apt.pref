@@ -1,0 +1,3 @@
+Package: *
+Pin: origin {{ item.pref_url }}
+Pin-Priority: 1000

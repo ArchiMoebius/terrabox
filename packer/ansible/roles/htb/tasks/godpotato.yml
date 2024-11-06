@@ -1,0 +1,33 @@
+- name: Make godpotato directory
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/godpotato"
+    state: directory
+    mode: "0755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Check if GodPotato is already installed
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/godpotato/GodPotato-NET4.exe"
+  register: godpotato_bin
+
+- name: Get latest GodPotato release
+  community.general.github_release:
+    user: BeichenDream
+    repo: GodPotato
+    action: latest_release
+  register: godpotato
+  when: not godpotato_bin.stat.exists
+
+- name: Download latest GodPotato release
+  ansible.builtin.get_url:
+    url: https://github.com/BeichenDream/GodPotato/releases/download/{{ godpotato.tag }}/GodPotato-{{ item }}.exe
+    dest: "{{ vm_tool_base }}/godpotato/GodPotato-{{ item }}.exe"
+    mode: "664"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  loop:
+    - NET2
+    - NET35
+    - NET4
+  when: not godpotato_bin.stat.exists

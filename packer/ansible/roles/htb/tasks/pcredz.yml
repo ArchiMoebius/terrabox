@@ -1,0 +1,9 @@
+- name: Install Pcredz
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: pcredz
+      repo: https://github.com/lgandx/PCredz
+      scripts:
+        - Pcredz
+      packages:
+        - python-libpcap

@@ -1,0 +1,89 @@
+#cloud-config
+autoinstall: # https://canonical-subiquity.readthedocs-hosted.com/en/latest/tutorial/providing-autoinstall.html#autoinstall-by-way-of-cloud-config
+  version: 1 # validate this file with sudo cloud-init schema --config-file=user-data --annotate
+
+  apt:
+    preserve_sources_list: false
+    mirror-selection:
+      primary:
+        - country-mirror
+        - uri: "http://archive.ubuntu.com/ubuntu"
+          arches: [i386, amd64]
+    fallback: offline-install
+    geoip: true
+
+  packages:
+    - ubuntu-desktop
+    - openssh-server
+    - build-essential
+    - linux-headers-generic
+    - python3-venv
+    - gcc
+    - build-essential
+    - dkms
+
+  identity:
+    realname: ""
+    username: user
+    # A password hash is needed. `mkpasswd --method=SHA-512` can help.
+    # mkpasswd can be found in the package 'whois'
+    password: "$6$GIlzhV60yzgyxZ6T$MZwy9StvHG.zQSjLY7M6GdY1TCKcKpqd4OpSflQakcLy8NwuCXXVIKqVrKa62FSMfa.fXzMItuFgwgcgN7iob0" # password
+    hostname: v
+
+  users:
+    - name: user
+      gecos: "I am Torgo; I take care of the place while the Master is away"
+      primary_group: user
+      lock-passwd: false
+      passwd: "$6$GIlzhV60yzgyxZ6T$MZwy9StvHG.zQSjLY7M6GdY1TCKcKpqd4OpSflQakcLy8NwuCXXVIKqVrKa62FSMfa.fXzMItuFgwgcgN7iob0" # password
+      shell: /bin/bash
+      ssh_authorized_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHznOa5q1lKXgu4Qv5Q2HI/2mxCSFCO+txRObP/agD/x"
+      sudo: "ALL=(ALL) NOPASSWD:ALL"
+      uid: 1000
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  codecs:
+    install: true
+
+  drivers:
+    install: true
+
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+
+  timezone: "Etc/UTC"
+
+  network:
+    version: 2
+    ethernets:
+      enp0s3:
+        dhcp4: true
+
+  storage:
+    layout:
+      name: direct
+      policy: all
+
+  late-commands:
+    - >-
+      curtin in-target --
+      sed -i /etc/default/grub -e
+      's/GRUB_CMDLINE_LINUX_DEFAULT=".*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/'
+
+    - curtin in-target -- update-grub
+    - curtin in-target -- apt-get update -y
+    - curtin in-target -- apt-get upgrade -y
+    - curtin in-target -- apt-get install -y cloud-init
+    - curtin in-target -- apt-get autoremove -y
+
+  shutdown: reboot
+# See: https://canonical-subiquity.readthedocs-hosted.com/en/latest/reference/autoinstall-reference.html
+
+# un-comment below to debug failures - something like: nc -l  -p 5050 >> /tmp/debug.log
+# error-commands:
+#   - find /var/log/ -type f tar -c {} | nc 10.43.138.8 5050 \;

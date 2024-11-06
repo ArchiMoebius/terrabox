@@ -1,0 +1,6 @@
+- name: Install Certipy
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: certipy
+      repo: https://github.com/ly4k/Certipy.git
+      pipx: true

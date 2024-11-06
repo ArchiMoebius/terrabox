@@ -1,0 +1,36 @@
+- name: Copy iptables IPv4 configuration file
+  ansible.builtin.copy:
+    src: files/rules.v4
+    dest: /etc/iptables/rules.v4
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Copy iptables IPv6 configuration file
+  ansible.builtin.copy:
+    src: files/rules.v6
+    dest: /etc/iptables/rules.v6
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Copy iptables rsyslog configuration file
+  ansible.builtin.copy:
+    src: files/10-iptables.conf
+    dest: /etc/rsyslog.d/10-iptables.conf
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Copy tail firewall script
+  ansible.builtin.copy:
+    src: files/tail_firewall.py
+    dest: /usr/sbin/tail_firewall
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install rich
+  ansible.builtin.pip:
+    name: rich
+    break_system_packages: true

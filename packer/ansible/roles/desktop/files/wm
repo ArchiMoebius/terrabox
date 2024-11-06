@@ -1,0 +1,9 @@
+[User]
+Languages=;
+Session=regolith-x11
+XSession=i3
+Icon=/home/user/.face
+SystemAccount=false
+
+[InputSource0]
+xkb=us

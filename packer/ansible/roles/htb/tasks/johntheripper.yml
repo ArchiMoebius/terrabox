@@ -1,0 +1,52 @@
+- name: Clone john repo
+  ansible.builtin.git:
+    repo: https://github.com/openwall/john.git
+    depth: 1
+    dest: "{{ vm_tool_base }}/johntheripper"
+    version: bleeding-jumbo
+    update: false
+    accept_newhostkey: true
+  register: johntheripper
+
+- name: Configure john
+  ansible.builtin.command: ./configure
+  args:
+    chdir: "{{ vm_tool_base }}/johntheripper/src"
+    creates: "{{ vm_tool_base }}/johntheripper/src/Makefile"
+
+- name: Build john
+  ansible.builtin.shell: make -s clean && make -sj8
+  args:
+    chdir: "{{ vm_tool_base }}/johntheripper/src"
+    creates: "{{ vm_tool_base }}/johntheripper/run/john"
+
+- name: Symlink john
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/johntheripper/run/john"
+    dest: /usr/local/bin/john
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Symlink john
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/johntheripper/run/john"
+    dest: /usr/local/bin/john
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+
+- name: Get the next *2john helper scripts
+  ansible.builtin.command: "find . -name '*2john*'"
+  args:
+    chdir: "{{ vm_tool_base }}/johntheripper/run"
+  register: jtr
+
+- name: Link *2John helper scripts
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/johntheripper/run/{{ item }}"
+    dest: /usr/local/bin/{{ item }}
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  with_items: "{{ jtr.stdout_lines }}"

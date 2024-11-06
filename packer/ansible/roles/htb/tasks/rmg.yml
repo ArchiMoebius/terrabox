@@ -1,0 +1,47 @@
+- name: Check if Remote Method Guesser is already installed
+  ansible.builtin.stat:
+    path: "{{ vm_tool_base }}/rmg/rmg.jar"
+  register: rmg_bin
+
+- name: "Make {{ vm_tool_base }}/rmg"
+  ansible.builtin.file:
+    path: "{{ vm_tool_base }}/rmg"
+    state: directory
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    mode: "0750"
+  when: not rmg_bin.stat.exists
+
+- name: Get latest Remote Method Guesser release
+  community.general.github_release:
+    user: qtc-de
+    repo: remote-method-guesser
+    action: latest_release
+  register: rmg
+  when: not rmg_bin.stat.exists
+
+- name: Download latest Remote Method Guesser release
+  ansible.builtin.get_url:
+    url: https://github.com/qtc-de/remote-method-guesser/releases/download/{{ rmg.tag }}/rmg-{{ rmg.tag | replace('v', '') }}-jar-with-dependencies.jar
+    dest: "{{ vm_tool_base }}/rmg/rmg.jar"
+    mode: "755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+  when: not rmg_bin.stat.exists
+
+- name: Copy entrypoint script for rmg
+  ansible.builtin.copy:
+    src: files/rmg/rmg.sh
+    dest: "{{ vm_tool_base }}/rmg/rmg.sh"
+    mode: "755"
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    force: true
+
+- name: Symlink rmg entrypoint
+  ansible.builtin.file:
+    src: "{{ vm_tool_base }}/rmg/rmg.sh"
+    dest: /usr/local/bin/rmg
+    state: link
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"

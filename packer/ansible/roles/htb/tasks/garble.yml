@@ -1,0 +1,19 @@
+- name: Check if garble is installed
+  ansible.builtin.stat:
+    path: /usr/local/go/bin/garble
+  register: garble
+
+- name: Install garble
+  ansible.builtin.command:
+    cmd: /usr/local/go/bin/go install mvdan.cc/garble@latest
+  when: not garble.stat.exists
+
+- name: Copy garble
+  ansible.builtin.copy:
+    src: "/root/go/bin/garble"
+    dest: /usr/local/go/bin/garble
+    owner: "{{ vm_user }}"
+    group: "{{ vm_user }}"
+    remote_src: true
+    force: true
+    mode: "0755"

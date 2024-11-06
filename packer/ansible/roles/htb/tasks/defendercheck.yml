@@ -1,0 +1,12 @@
+- name: Clone DefenderCheck repo
+  ansible.builtin.git:
+    repo: https://github.com/matterpreter/DefenderCheck.git
+    dest: "{{ vm_tool_base }}/defendercheck"
+    depth: 1
+  register: defendercheck
+
+- name: Build DefenderCheck
+  ansible.builtin.command:
+    cmd: /usr/bin/msbuild DefenderCheck.sln -t:Rebuild -p:Configuration=Release
+    chdir: "{{ vm_tool_base }}/defendercheck/DefenderCheck"
+  when: defendercheck.before != defendercheck.after

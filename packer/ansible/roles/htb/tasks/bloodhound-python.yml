@@ -1,0 +1,7 @@
+- name: Install BloodHound.py
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: bloodhound_dot_py
+      repo: https://github.com/dirkjanm/BloodHound.py.git
+      repo_branch: bloodhound-ce
+      pipx: true

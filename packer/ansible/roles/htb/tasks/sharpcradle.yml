@@ -1,0 +1,11 @@
+- name: Clone SharpCradle repo
+  ansible.builtin.git:
+    repo: https://github.com/anthemtotheego/SharpCradle.git
+    dest: "{{ vm_tool_base }}/sharpcradle"
+    depth: 1
+  register: sharpcradle
+
+- name: Build SharpCradle # noqa no-changed-when
+  ansible.builtin.command:
+    cmd: /usr/bin/msbuild SharpCradle.sln -t:Rebuild -p:Configuration=Release
+    chdir: "{{ vm_tool_base }}/sharpcradle"

@@ -1,0 +1,6 @@
+- name: Install ldapdomaindump
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: ldapdomaindump
+      repo: https://github.com/dirkjanm/ldapdomaindump.git
+      pipx: true

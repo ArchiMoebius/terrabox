@@ -1,0 +1,6 @@
+- name: Install adidnsdump
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: adidnsdump
+      repo: https://github.com/dirkjanm/adidnsdump.git
+      pipx: true

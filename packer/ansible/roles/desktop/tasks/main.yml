@@ -1,0 +1,11 @@
+- name: Configure Regolith
+  ansible.builtin.include_tasks: regolith.yml
+
+- name: Configure ZSH
+  ansible.builtin.include_tasks: zsh.yml
+
+- name: Configure dotrc
+  ansible.builtin.include_tasks: dotrc.yml
+
+- name: Configure system
+  ansible.builtin.include_tasks: system.yml

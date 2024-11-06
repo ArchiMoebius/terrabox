@@ -1,0 +1,17 @@
+- name: Play for setting up a VM
+  hosts: all
+  become: true
+  vars:
+    vm_user: user
+    vm_tool_base: /usr/local/src
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - snap
+    - telemetry
+    - apt
+    - desktop
+    - firewall
+    - golang
+    - python
+    - zig
+    - htb

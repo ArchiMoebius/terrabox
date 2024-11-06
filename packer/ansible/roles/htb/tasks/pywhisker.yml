@@ -1,0 +1,7 @@
+- name: Install PyWhisker
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: pywhisker
+      repo: https://github.com/ShutdownRepo/pywhisker.git
+      scripts:
+        - pywhisker/pywhisker.py

@@ -1,0 +1,43 @@
+# START nuke when migration to sway
+- name: Disable lock screen
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  loop:
+    - /usr/bin/dbus-launch gsettings set org.gnome.desktop.screensaver lock-enabled false
+    - /usr/bin/dbus-launch gsettings set org.gnome.gnome-flashback screensaver false
+  become: true
+  become_user: "{{ vm_user }}"
+# STOP nuke when migration to sway
+
+- name: Copy background
+  ansible.builtin.copy:
+    src: files/background.jpg
+    dest: /usr/share/backgrounds/background.jpg
+    mode: "0644"
+    force: true
+
+- name: Enable autologon
+  ansible.builtin.template:
+    src: templates/gdm_custom.j2
+    dest: /etc/gdm3/custom.conf
+    mode: "0644"
+
+- name: Set hostname to {{ vm_name }}
+  ansible.builtin.hostname:
+    name: "{{ vm_name }}"
+
+- name: Update /etc/hosts
+  ansible.builtin.template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    mode: "644"
+
+- name: Set DNS to 1.1.1.1 and 8.8.8.8
+  community.general.nmcli:
+    conn_name: "{{ ansible_default_ipv4.interface }}"
+    type: ethernet
+    dns4:
+      - 1.1.1.1
+      - 8.8.8.8
+    dns4_ignore_auto: true
+    state: present
