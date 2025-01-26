@@ -1,0 +1,13 @@
+- name: Install Evil-WinRM
+  ansible.builtin.git:
+    repo: https://github.com/Hackplayers/evil-winrm.git
+    dest: "{{ vm_tool_base }}/evil-winrm"
+    depth: 1
+
+- name: Build Evil-WinRM docker image
+  community.docker.docker_image:
+    build:
+      path: "{{ vm_tool_base }}/evil-winrm"
+    name: evil-winrm
+    tag: local
+    source: build

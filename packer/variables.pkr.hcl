@@ -25,7 +25,7 @@ variable "version" {
 
 variable "virtualbox_disk_size" {
   type    = string
-  default = "81200"
+  default = "102400"
 }
 
 variable "headless" {
@@ -42,4 +42,8 @@ variable "iso_url" {
 
 variable "vm_name" {
   type    = string
+}
+
+variable "ssh_nat_port" {
+  type    = number
 }

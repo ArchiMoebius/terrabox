@@ -23,6 +23,8 @@
   ansible.builtin.include_tasks: donpapi.yml
 - name: Setup dploot
   ansible.builtin.include_tasks: dploot.yml
+- name: Setup evil-winrm
+  ansible.builtin.include_tasks: evil-winrm.yml
 - name: Setup godpotato
   ansible.builtin.include_tasks: godpotato.yml
 - name: Setup impacket
@@ -31,12 +33,18 @@
   ansible.builtin.include_tasks: johntheripper.yml
 - name: Setup kerbrute
   ansible.builtin.include_tasks: kerbrute.yml
+- name: Setup keytabextract
+  ansible.builtin.include_tasks: keytabextract.yml
+- name: Setup krb5keygen
+  ansible.builtin.include_tasks: krb5keygen.yml
 - name: Setup lazagne
   ansible.builtin.include_tasks: lazagne.yml
 - name: Setup ldapdomaindump
   ansible.builtin.include_tasks: ldapdomaindump.yml
 - name: Setup ligolong
   ansible.builtin.include_tasks: ligolong.yml
+- name: Setup lsassy
+  ansible.builtin.include_tasks: lsassy.yml
 - name: Setup neo
   ansible.builtin.include_tasks: neo.yml
 - name: Setup netexec

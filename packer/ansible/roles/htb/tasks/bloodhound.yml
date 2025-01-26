@@ -3,3 +3,9 @@
     repo: https://github.com/SpecterOps/BloodHound.git
     dest: "{{ vm_tool_base }}/bloodhound"
     depth: 1
+
+- name: Ensure default password
+  ansible.builtin.lineinfile:
+    path: "{{ vm_tool_base }}/bloodhound/examples/docker-compose/docker-compose.yml"
+    insertafter: ".*bhe_neo4j_connection=neo4j"
+    line: '      - bhe_default_admin_password=password\n      - bhe_default_admin_expire_now=false'

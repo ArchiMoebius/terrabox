@@ -14,6 +14,7 @@ packer {
 }
 
 # https://developer.hashicorp.com/packer/docs/templates/hcl_templates/blocks/build/source
+# https://developer.hashicorp.com/packer/integrations/hashicorp/virtualbox/latest/components/builder/iso
 source "virtualbox-iso" "ubuntu_builder" {
   boot_command = [
     "<wait>c",
@@ -34,7 +35,7 @@ source "virtualbox-iso" "ubuntu_builder" {
   boot_wait              = "10s"
   disk_size              = "${var.virtualbox_disk_size}"
   rtc_time_base          = "UTC"
-  gfx_accelerate_3d      = true
+  gfx_accelerate_3d      = false
   gfx_controller         = "vmsvga"
   gfx_vram_size          = 128
   guest_additions_mode   = "upload"
@@ -46,16 +47,17 @@ source "virtualbox-iso" "ubuntu_builder" {
   shutdown_command       = "echo '${var.ansible_user}' | sudo -S shutdown -P now"
   ssh_handshake_attempts = "9001"
   ssh_password           = "${var.ansible_password}"
-  ssh_port               = 2222
+  ssh_port               = var.ssh_nat_port
   ssh_host               = "127.0.0.1"
   skip_nat_mapping       = true
   ssh_timeout            = "10000s"
   ssh_username           = "${var.ansible_user}"
+  disable_shutdown       = true
   vboxmanage             = [
     ["modifyvm", "{{ .Name }}", "--memory", "${var.ram}"],
     ["modifyvm", "{{ .Name }}", "--vram", "128"],
     ["modifyvm", "{{ .Name }}", "--cpus", "${var.cpus}"],
-    ["modifyvm", "{{ .Name }}", "--natpf1", "guestssh,tcp,127.0.0.1,2222,,22"],  # https://www.virtualbox.org/manual/ch06.html#natforward
+    ["modifyvm", "{{ .Name }}", "--natpf1", "guestssh,tcp,127.0.0.1,${var.ssh_nat_port},,22"],  # https://www.virtualbox.org/manual/ch06.html#natforward
     ["modifyvm", "{{ .Name }}", "--nat-localhostreachable1", "on"], # https://github.com/hashicorp/packer/issues/12118
   ]
   vm_name                = "${var.vm_name}"
@@ -102,4 +104,9 @@ build {
     ]
   }
 
+  // not sure how to accomplish this...doesn't work in a local-shell provisioner b/c vbox has lock on vm due to packer...
+  // doesn't exist here, b/c it's been exported already...
+  // post-processor "shell-local" {
+  //   inline            = ["/usr/bin/vboxmanage modifyvm \"${var.vm_name}\" --natpf1 delete \"guestssh\""]
+  // }
 }

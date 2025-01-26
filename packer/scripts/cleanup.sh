@@ -45,4 +45,4 @@ sync
 echo "==> Disk usage after cleanup"
 df -h
 
-init 0
+sudo init 0

@@ -1,0 +1,7 @@
+- name: Install KeyTabExtract
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: KeyTabExtract
+      repo: https://github.com/sosdave/KeyTabExtract.git
+      scripts:
+        - keytabextract.py

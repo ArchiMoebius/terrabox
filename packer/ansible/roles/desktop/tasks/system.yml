@@ -22,10 +22,6 @@
     dest: /etc/gdm3/custom.conf
     mode: "0644"
 
-- name: Set hostname to {{ vm_name }}
-  ansible.builtin.hostname:
-    name: "{{ vm_name }}"
-
 - name: Update /etc/hosts
   ansible.builtin.template:
     src: templates/hosts.j2
@@ -35,7 +31,7 @@
 - name: Set DNS to 1.1.1.1 and 8.8.8.8
   community.general.nmcli:
     conn_name: "{{ ansible_default_ipv4.interface }}"
-    type: ethernet
+    type: "ethernet"
     dns4:
       - 1.1.1.1
       - 8.8.8.8

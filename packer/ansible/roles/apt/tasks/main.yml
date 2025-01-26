@@ -37,10 +37,6 @@
   ansible.builtin.command:
     cmd: apt-get upgrade -y 
 
-- name: Upgrade packages to latest
-  ansible.builtin.command:
-    cmd: apt dist-upgrade 
-
 - name: Configure wireshark for users
   ansible.builtin.debconf:
     name: 'wireshark-common'

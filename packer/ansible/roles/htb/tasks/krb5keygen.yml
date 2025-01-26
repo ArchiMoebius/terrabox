@@ -1,0 +1,14 @@
+- name: Install Krb5KeyGen
+  ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
+  loop:
+    - name: Krb5KeyGen
+      repo: https://github.com/jalvarezz13/Krb5KeyGen.git
+      scripts:
+        - krb5_keygen.py
+      packages:
+        - cryptography
+
+- lineinfile:
+    path: /usr/local/src/Krb5KeyGen/krb5_keygen.py
+    insertbefore: BOF # beginning of the file, see SO#48897013
+    line: /usr/local/src/Krb5KeyGen/env/bin/python3
