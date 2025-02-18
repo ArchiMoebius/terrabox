@@ -100,6 +100,16 @@ build {
     expect_disconnect = true
     skip_clean        = true
     scripts           = [
+      "scripts/obsidian.sh",
+    ]
+  }
+
+  provisioner "shell" {
+    environment_vars  = ["HOME_DIR=/home/${var.ansible_user}"]
+    execute_command   = "echo '${var.ansible_password}' | {{ .Vars }} sudo -S -E sh -eux '{{ .Path }}'"
+    expect_disconnect = true
+    skip_clean        = true
+    scripts           = [
       "scripts/cleanup.sh",
     ]
   }

@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 
 import os
+import queue
 import re
+import threading
 import time
 
 from pathlib import PosixPath
 
 try:
+    from rich.console import Console
     from rich.live import Live
+    from rich.panel import Panel
     from rich.table import Table
+    from rich.text import Text
 except ModuleNotFoundError:
     print("Run the following: python3 -m pip install rich")
 
@@ -28,83 +33,102 @@ LOG_RE = p = re.compile(
     re.IGNORECASE,
 )
 
+def parse_line(line):
+    m = LOG_RE.match(line)
 
-def tailf(thefile):
-    thefile.seek(0, os.SEEK_END)
+    if m:
+        entry = m.groupdict()
+        din = entry.get("in", "")
+        direction = "[green]IN"
 
-    while True:
+        if len(din) <= 0:
+            direction = "[yellow]OUT"
+        
+        proto = entry.get("proto", False)
+
+        if not proto:
+            proto = "[bold red]unknown"
+        else:
+            color = "[dark_sea_green4]"
+
+            if proto.lower() == "udp":
+                color = "[steel_blue]"
+
+            if proto.lower() == "icmp":
+                color = "[deep_pink4]"
+
+            proto = f"{color}{proto}"
+
+        sip = entry.get("sip", "[/][red]unknown")
+        spt = entry.get("spt", "[/][red]-1")
+        extras = ""
+
+        if spt:
+            extras = f"[/]:[bold grey69]{spt}"
+
+        dip = entry.get("dip", "[/][red]unknown")
+        dpt = entry.get("dpt", "[/][red]-1")
+        extrad = ""
+
+        if dpt:
+            extrad = f"[/]:[bold tan]{dpt}"
+
+        return f"{direction.strip()}\t[/]{proto:<20}[/][light_steel_blue]{sip+extras:<42}[/][misty_rose3]{(dip+extrad):<42}[/][misty_rose3]{entry.get("ttl", ""):<10}[/][misty_rose3]{entry.get("length", ""):<10}[/]".strip()
+
+    return None
+
+def tailf(stop_event, table_queue, thefile):
+    # thefile.seek(0, os.SEEK_END)
+
+    while not stop_event.is_set():
         line = thefile.readline()
         if not line:
             time.sleep(0.1)
             continue
-
-        yield line
-
+        
+        try:
+            entry = parse_line(line)
+            if entry != None:
+                table_queue.put(entry)
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     logfile = open("/var/log/iptables.log", "r")
+    table_queue = queue.Queue(0)
+    stop_event = threading.Event()
 
+    # Start the table updating thread
+    table_thread = threading.Thread(target=tailf, args=(stop_event, table_queue, logfile))
+    table_thread.daemon = True
+    table_thread.start()
+
+    console = Console()
+    header = Text("\nDir     Proto   Source                    Destination                  TTL       Size", style="bold cyan")
+    console.print(header)
+
+    cnt = 0
     try:
-        table = Table()
-        table.add_column("Direction")
-        table.add_column("Protocol")
-        table.add_column("Source")
-        table.add_column("Destination")
-        table.add_column("TTL")
-        table.add_column("Size")
-        # table.add_column("MAC")
+        while True:
+            while not table_queue.empty():
+                try:
+                    row = table_queue.get(block=False, timeout=2)
+                    console.print(row)
+                except queue.Empty:
+                    break
+                finally:
+                    cnt +=1
 
-        with Live(table, refresh_per_second=4):
-            for line in tailf(logfile):
+                if cnt %21 == 0:
+                    console.print(header)
+                    cnt = 1
 
-                m = LOG_RE.match(line)
-
-                if m:
-                    entry = m.groupdict()
-                    din = entry.get("in", "")
-                    direction = "IN"
-
-                    if len(din) <= 0:
-                        direction = "[yellow]OUT"
-
-                    proto = entry.get("proto", False)
-
-                    if not proto:
-                        proto = "[bold red]unknown"
-                    else:
-                        color = "[dark_sea_green4]"
-
-                        if proto.lower() == "udp":
-                            color = "[steel_blue]"
-
-                        if proto.lower() == "icmp":
-                            color = "[deep_pink4]"
-
-                        proto = f"{color}{proto}"
-
-                    sip = entry.get("sip", "[/][red]unknown")
-                    spt = entry.get("spt", "[/][red]-1")
-                    extras = ""
-
-                    if spt:
-                        extras = f":[bold grey69]{spt}"
-
-                    dip = entry.get("dip", "[/][red]unknown")
-                    dpt = entry.get("dpt", "[/][red]-1")
-                    extrad = ""
-
-                    if dpt:
-                        extrad = f":[bold tan]{dpt}"
-
-                    table.add_row(
-                        direction,
-                        f"{proto}",
-                        f"[light_steel_blue]{sip}[/]{extras}",
-                        f"[misty_rose3]{dip}[/]{extrad}",
-                        entry.get("ttl", ""),
-                        entry.get("length", ""),
-                    )
-    except Exception:
+    except KeyboardInterrupt:
         pass
+    except Exception:
+        import traceback
+        traceback.print_exc()
     finally:
+        stop_event.set()
+        table_thread.join(timeout=1)
         logfile.close()
