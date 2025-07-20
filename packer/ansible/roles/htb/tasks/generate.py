@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+#
+# TODO: run me if a task is added to this directory
 
 from pathlib import PosixPath
 

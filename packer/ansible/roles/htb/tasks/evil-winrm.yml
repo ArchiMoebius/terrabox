@@ -1,6 +1,6 @@
 - name: Install Evil-WinRM
   ansible.builtin.git:
-    repo: https://github.com/Hackplayers/evil-winrm.git
+    repo: https://github.com/ArchiMoebius/evil-winrm.git
     dest: "{{ vm_tool_base }}/evil-winrm"
     depth: 1
 

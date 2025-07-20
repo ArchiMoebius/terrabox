@@ -5,7 +5,7 @@
 
 - name: Download golang
   ansible.builtin.get_url:
-    url: "https://go.dev/dl/go1.23.6.linux-amd64.tar.gz"
+    url: "https://go.dev/dl/go1.24.5.linux-amd64.tar.gz"
     dest: /tmp/golang.tgz
     mode: "600"
   when: not go_bin.stat.exists
@@ -16,3 +16,12 @@
     dest: /usr/local
     remote_src: true
   when: not go_bin.stat.exists
+
+# https://go.dev/doc/telemetry
+- name: Disable telemetry
+  ansible.builtin.command:
+    cmd: "{{ item }}"
+  loop:
+    - /usr/local/go/bin/go telemetry off
+  become: true
+  become_user: "{{ vm_user }}"

@@ -28,8 +28,14 @@ EOF
 
     packer init .
     packer build .
-    # /usr/bin/vboxmanage modifyvm "${VM_NAME}" --natpf1 delete "guestssh"
+
+    # /usr/bin/VBoxManage modifyvm "${VM_NAME}" --natpf1 delete "guestssh"
+    # /usr/bin/VBoxManage setextradata "${VM_NAME}" "VBoxInternal/TM/TSCTiedToExecution" 1
+    # /usr/bin/VBoxManage setextradata "${VM_NAME}" "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled" 1
+    # /usr/bin/VBoxManage guestproperty set "${VM_NAME}" "/VirtualBox/GuestAdd/SyncTime" 0
+
     pwd
+
     ls -hrl ./output-ubuntu_builder/
 
 popd
