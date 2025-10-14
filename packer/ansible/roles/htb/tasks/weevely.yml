@@ -3,5 +3,4 @@
   loop:
     - name: weevely3
       repo: https://github.com/epinna/weevely3.git
-      scripts:
-        - weevely.py
+      pipx: true

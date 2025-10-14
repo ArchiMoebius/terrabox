@@ -49,8 +49,8 @@
   ansible.builtin.include_tasks: neo.yml
 - name: Setup netexec
   ansible.builtin.include_tasks: netexec.yml
-- name: Setup nimcrypt2
-  ansible.builtin.include_tasks: nimcrypt2.yml
+# - name: Setup nimcrypt2
+#   ansible.builtin.include_tasks: nimcrypt2.yml
 - name: Setup pcredz
   ansible.builtin.include_tasks: pcredz.yml
 - name: Setup pkinittools
@@ -81,8 +81,8 @@
   ansible.builtin.include_tasks: sliver.yml
 - name: Setup sqlmap
   ansible.builtin.include_tasks: sqlmap.yml
-- name: Setup weevely
-  ansible.builtin.include_tasks: weevely.yml
+# - name: Setup weevely
+#   ansible.builtin.include_tasks: weevely.yml
 - name: Setup wesng
   ansible.builtin.include_tasks: wesng.yml
 - name: Setup wmiprocesswatcher
