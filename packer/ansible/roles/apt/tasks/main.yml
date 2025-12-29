@@ -16,7 +16,7 @@
       key_url: https://download.docker.com/linux/ubuntu/gpg
       repo_url: "https://download.docker.com/linux/ubuntu"
       repo_extra: "arch=amd64"
-      repo_pool: "{{ ansible_distribution_release | lower }} stable"
+      repo_pool: "{{ ansible_facts['distribution_release'] | lower }} stable"
       repo_remove: "docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc"
     - name: vscodium
       key_url: https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
@@ -29,13 +29,13 @@
       repo_pool: "stable-focal main"
       repo_extra: ""
 
-- name: Update cache
-  ansible.builtin.command:
-    cmd: apt-get update
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
 
-- name: Upgrade packages to latest
-  ansible.builtin.command:
-    cmd: apt-get upgrade -y 
+- name: Upgrade all packages to the latest version
+  ansible.builtin.apt:
+    upgrade: dist
 
 - name: Configure wireshark for users
   ansible.builtin.debconf:
