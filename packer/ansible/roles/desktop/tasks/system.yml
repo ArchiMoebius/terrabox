@@ -30,7 +30,7 @@
 
 - name: Set DNS to 1.1.1.1 and 8.8.8.8
   community.general.nmcli:
-    conn_name: "{{ ansible_default_ipv4.interface }}"
+    conn_name: "{{ ansible_facts['default_ipv4']['interface'] }}"
     type: "ethernet"
     dns4:
       - 1.1.1.1

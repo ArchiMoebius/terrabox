@@ -19,8 +19,8 @@ ssh_nat_port=$((RANDOM % range + min_port))
 
 pushd $BASEDIR
     cat > Ubuntu24_LTS_64.auto.pkrvars.hcl << EOF
-iso_url = "https://releases.ubuntu.com/noble/ubuntu-24.04.2-desktop-amd64.iso"
-iso_checksum = "sha256:d7fe3d6a0419667d2f8eff12796996328daa2d4f90cd9f87aa9371b362f987bf"
+iso_url = "https://releases.ubuntu.com/noble/ubuntu-24.04.3-desktop-amd64.iso"
+iso_checksum = "sha256:faabcf33ae53976d2b8207a001ff32f4e5daae013505ac7188c9ea63988f8328"
 headless = false
 vm_name = "${VM_NAME}"
 ssh_nat_port = ${ssh_nat_port}

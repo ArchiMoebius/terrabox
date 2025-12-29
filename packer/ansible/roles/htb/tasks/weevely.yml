@@ -2,6 +2,5 @@
   ansible.builtin.include_tasks: roles/python/tasks/bootstrap.yml
   loop:
     - name: weevely3
-      repo: https://github.com/epinna/weevely3.git
-      scripts:
-        - weevely.py
+      repo: https://github.com/ArchiMoebius/weevely3.git
+      pipx: true

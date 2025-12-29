@@ -1,0 +1,5 @@
+    VBoxService --disable-timesync;
+    VBoxService --timesync-set-on-restore 0;
+    VBoxService --disable-vmstats;
+    VBoxService --disable-vminfo;
+

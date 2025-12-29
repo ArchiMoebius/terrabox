@@ -14,9 +14,9 @@
 
 - name: Download BurpSuite install script
   ansible.builtin.get_url:
-    url: https://portswigger-cdn.net/burp/releases/download?product=community&version=2024.6.6&type=Linux
+    url: https://portswigger.net/burp/releases/download?product=community&version=2025.12.2&type=Linux
     dest: "{{ vm_tool_base }}/burpsuite/install.sh"
-    checksum: sha256:e38efb0e28fa6d67cddcecb80d5c2db9fe94f38441354a9b000da2a144948e26
+    checksum: sha256:196f79d7884347743fa546a611800fa84c519da70d5294fa3a5abbe2858d18f7
     mode: "0755"
     owner: "{{ vm_user }}"
     group: "{{ vm_user }}"

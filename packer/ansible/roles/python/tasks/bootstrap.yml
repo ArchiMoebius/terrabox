@@ -60,7 +60,7 @@
   loop: "{{ item.scripts }}"
   loop_control:
     loop_var: script
-  when: (item.pipx is not defined or not item.pipx) and item.scripts is defined
+  when: (item.pipx is not defined or not item.pipx|bool) and item.scripts is defined
 
 - name: Symlink scripts in {{ item.name }}
   ansible.builtin.file:
