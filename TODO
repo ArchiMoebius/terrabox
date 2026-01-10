@@ -3,3 +3,4 @@
     VBoxService --disable-vmstats;
     VBoxService --disable-vminfo;
 
+sudo touch /etc/NetworkManager/conf.d/20-connectivity-ubuntu.conf
